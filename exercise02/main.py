@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Query, Request
+from fastapi import FastAPI, Query, Request, HTTPException
 from pydantic import BaseModel
 
 app = FastAPI()
@@ -15,3 +15,11 @@ def read_hello(name: str = Query(default=None), is_teacher: bool = Query(default
         return f"Hello Teacher {name}!"
     else:
         return f"Hello {name}!"
+    
+@app.put("/top-secret")
+async def top_secret(request: Request):
+    auth = request.headers.get("Authorization")
+    if auth != "my-secret-key":
+        raise HTTPException(status_code=403, detail="Forbidden")
+    return {"message": "Top secret data accessed successfully!"}
+
